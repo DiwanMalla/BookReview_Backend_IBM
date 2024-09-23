@@ -1,36 +1,31 @@
-const express = require('express');
+const express = require("express");
 let books = require("./booksdb.js");
 let isValid = require("./auth_users.js").isValid;
 let users = require("./auth_users.js").users;
 const axios = require("axios");
 const public_users = express.Router();
 
-
 public_users.use(express.json());
 
-
-
-
-public_users.post("/register", (req,res) => {
+public_users.post("/register", (req, res) => {
   //Write your code here
   let username = req.body.username;
   let password = req.body.password;
-  console.log(req.body)
-  if(username && password){
-    if(isValid(username)){
-      users.push({username:username,password:password});
-      return res.status(200).json({message: "User registered successfully"});
+  console.log(req.body);
+  if (username && password) {
+    if (isValid(username)) {
+      users.push({ username: username, password: password });
+      return res.status(200).json({ message: "User registered successfully" });
+    } else {
+      return res.status(400).json({ message: "Username already exists" });
     }
-    else{
-      return res.status(400).json({message: "Username already exists"});
-    }
-  }else{
-    return res.status(400).json({message: "Username or password not provided"});
+  } else {
+    return res
+      .status(400)
+      .json({ message: "Username or password not provided" });
   }
-
-
 });
-//task 1 
+//task 1
 // Get the book list available in the shop
 // public_users.get('/', async function (req, res) {
 
@@ -41,20 +36,16 @@ public_users.post("/register", (req,res) => {
 //   }
 // });
 
-
-public_users.get('/', async function (req, res) {
+public_users.get("/", async function (req, res) {
   //Write your code here
-  console.log('hello m here');
-  axios.get('http://localhost:5000/books').then(
-    (responseBooks)=>{
-      return res.status(200).send(JSON.stringify(responseBooks.data,null , 4));
-    }
-  ).catch(e=>
-    res.status(404).send("cant get books <br>  "+ e)
-    )
+  console.log("hello m here");
+  axios
+    .get("http://localhost:5000/books")
+    .then((responseBooks) => {
+      return res.status(200).send(JSON.stringify(responseBooks.data, null, 4));
+    })
+    .catch((e) => res.status(404).send("cant get books <br>  " + e));
 });
-
-
 
 // Get book details based on ISBN
 
@@ -70,14 +61,14 @@ public_users.get('/', async function (req, res) {
 //   }
 
 //  });
-  
- // task 11
-public_users.get('/isbn/:isbn', async function (req, res) {
+
+// task 11
+public_users.get("/isbn/:isbn", async function (req, res) {
   // Write your code here
   let isbn = req.params.isbn;
 
   try {
-    const response = await axios.get('http://localhost:5000/books');
+    const response = await axios.get("http://localhost:4000/books");
 
     if (response.data[isbn]) {
       return res.status(200).send(JSON.stringify(response.data[isbn], null, 4));
@@ -91,14 +82,7 @@ public_users.get('/isbn/:isbn', async function (req, res) {
   }
 });
 
-
-
-
-
-
-
-
-// Get book details based on author 
+// Get book details based on author
 //task 3
 // public_users.get('/author/:author',function (req, res) {
 //   //Write your code here
@@ -118,14 +102,14 @@ public_users.get('/isbn/:isbn', async function (req, res) {
 // });
 
 //task 12
-public_users.get('/author/:author', async function (req, res) {
+public_users.get("/author/:author", async function (req, res) {
   // Write your code here
   let author = req.params.author;
   let booksByAuthor = [];
 
   try {
     // Assuming the API endpoint for getting all books is http://localhost:5000/books
-    const response = await axios.get('http://localhost:5000/books');
+    const response = await axios.get("http://localhost:4000/books");
 
     for (let isbn in response.data) {
       if (response.data[isbn].author == author) {
@@ -144,17 +128,6 @@ public_users.get('/author/:author', async function (req, res) {
     return res.status(500).send("Internal Server Error");
   }
 });
-
-
-
-
-
-
-
-
-
-
-
 
 // Get all books based on title
 //task 4
@@ -178,14 +151,14 @@ public_users.get('/author/:author', async function (req, res) {
 
 //task 13
 
-public_users.get('/title/:title', async function (req, res) {
+public_users.get("/title/:title", async function (req, res) {
   // Write your code here
   let title = req.params.title;
   let booksByTitle = [];
 
   try {
     // Assuming the API endpoint for getting all books is http://localhost:5000/books
-    const response = await axios.get('http://localhost:5000/books');
+    const response = await axios.get("http://localhost:4000/books");
 
     for (let isbn in response.data) {
       if (response.data[isbn].title == title) {
@@ -205,31 +178,14 @@ public_users.get('/title/:title', async function (req, res) {
   }
 });
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 //  Get book review
-public_users.get('/review/:isbn',function (req, res) {
+public_users.get("/review/:isbn", function (req, res) {
   //Write your code here
   let isbn = req.params.isbn;
-  if(books[isbn]){
-    return res.status(200).send(JSON.stringify(books[isbn].reviews,null,4));
-  }
-  else{
-    return res.status(404).send("No book found with ISBN "+isbn);
+  if (books[isbn]) {
+    return res.status(200).send(JSON.stringify(books[isbn].reviews, null, 4));
+  } else {
+    return res.status(404).send("No book found with ISBN " + isbn);
   }
 });
 
